@@ -13,31 +13,43 @@ import './App.css';
 function App() {
   const [activeTab, setActiveTab] = useState<string>('portfolio');
   const [cvData, setCvData] = useState<CVData>(() => {
-    const saved = localStorage.getItem('gunjan_cv_data');
-    if (saved) {
-      try {
+    try {
+      const saved = localStorage.getItem('gunjan_cv_data');
+      if (saved) {
         return JSON.parse(saved);
-      } catch (e) {
-        console.error('Failed to parse saved CV data', e);
       }
+    } catch (e) {
+      console.error('Failed to load saved CV data', e);
     }
     return initialCVData;
   });
 
   const [theme, setTheme] = useState<string>(() => {
-    return localStorage.getItem('theme') || 'dark';
+    try {
+      return localStorage.getItem('theme') || 'dark';
+    } catch (e) {
+      return 'dark';
+    }
   });
 
   // Apply theme class
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    try {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+    } catch (e) {
+      console.error('Failed to set theme', e);
+    }
   }, [theme]);
 
   // Persist CV Data updates
   const handleUpdateCVData = (newData: CVData) => {
     setCvData(newData);
-    localStorage.setItem('gunjan_cv_data', JSON.stringify(newData));
+    try {
+      localStorage.setItem('gunjan_cv_data', JSON.stringify(newData));
+    } catch (e) {
+      console.error('Failed to save CV data', e);
+    }
   };
 
   const handleResetCVData = () => {
